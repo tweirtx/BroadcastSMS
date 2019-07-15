@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sms_maintained/sms.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:simple_permissions/simple_permissions.dart';
+
+
 
 void main() => runApp(MyApp());
 
@@ -8,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Broadcast SMS',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -39,23 +45,44 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  ContactsService contactsService = new ContactsService();
+  Iterable<Contact> contacts;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _showDialog(String message) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Notice"),
+          content: new Text(message),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _sendSMS(Contact contact) {
+    _showDialog(contact.phones.toList().elementAt(0).value);
+    SmsSender().sendSms(SmsMessage(contact.phones.toList().elementAt(0).value, "Broadcast SMS"));
+  }
+
+  void _loopThru() {
+    contacts.forEach(_sendSMS);
   }
 
   @override
@@ -91,22 +118,31 @@ class _MyHomePageState extends State<MyHomePage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
+
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            RaisedButton(
+              child: new Text("Contacts"),
+              onPressed: () async {
+                if (!await SimplePermissions.checkPermission(Permission.ReadContacts)) {
+                  await SimplePermissions.requestPermission(Permission.ReadContacts);
+                }
+                contacts = await ContactsService.getContacts();
+
+              },
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+            TextField(
+
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+          RaisedButton(
+            onPressed: _loopThru,
+            child: Text(
+                'Send',
+                style: TextStyle(fontSize: 20)
+            ),
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    ),
     );
   }
 }

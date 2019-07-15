@@ -18,6 +18,9 @@ environment:
 
 dependencies:
   sms_maintained: ^0.2.5
+  contacts_service: ^0.2.8
+  simple_permissions: ^0.1.9
+
   flutter:
     sdk: flutter
 
