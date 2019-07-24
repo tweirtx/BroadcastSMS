@@ -159,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final String title;
   final String reloadLabel = 'Reload!';
   final String fireLabel = 'Select Contacts';
-  final Color floatingButtonColor = Colors.red;
+  final Color floatingButtonColor = Colors.blue;
   final IconData reloadIcon = Icons.refresh;
   final IconData fireIcon = Icons.filter_center_focus;
 
