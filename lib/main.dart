@@ -132,7 +132,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onSubmit() {
-
+      Navigator.push(
+        context,
+        new MaterialPageRoute(builder: (context) => new SendScreen()),
+      );
   }
 
   ListTile _buildListTile(CustomContact c, List<Item> list) {
@@ -197,4 +200,56 @@ class CustomContact {
     this.contact,
     this.isChecked = false,
   });
+}
+class SendScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Broadcast SMS"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[TextField(
+
+          ),
+            RaisedButton(
+              onPressed: _textContacts,
+              child: Text(
+                  'Send',
+                  style: TextStyle(fontSize: 20)
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  void _textContacts() {
+    _showDialog("TODO");
+  }
+
+  void _showDialog(String message) {
+    // flutter defined function
+    showDialog(
+
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Notice"),
+          content: new Text(message),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
