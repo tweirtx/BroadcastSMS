@@ -11,11 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Broadcast SMS',
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(title: 'Custom contact selection'),
+      home: new MyHomePage(title: 'Contact Selection'),
     );
   }
 
@@ -26,8 +26,8 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
   final String reloadLabel = 'Reload!';
-  final String fireLabel = 'Fire in the hole!';
-  final Color floatingButtonColor = Colors.red;
+  final String fireLabel = 'Select contacts';
+  final Color floatingButtonColor = Colors.blue;
   final IconData reloadIcon = Icons.refresh;
   final IconData fireIcon = Icons.filter_center_focus;
 
@@ -132,26 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onSubmit() {
-    setState(() {
-      if (!_isSelectedContactsView) {
-        _uiCustomContacts =
-            _allContacts.where((contact) => contact.isChecked == true).toList();
-        _isSelectedContactsView = true;
-        _restateFloatingButton(
-          widget.reloadLabel,
-          Icons.refresh,
-          Colors.green,
-        );
-      } else {
-        _uiCustomContacts = _allContacts;
-        _isSelectedContactsView = false;
-        _restateFloatingButton(
-          widget.fireLabel,
-          Icons.filter_center_focus,
-          Colors.red,
-        );
-      }
-    });
+
   }
 
   ListTile _buildListTile(CustomContact c, List<Item> list) {
