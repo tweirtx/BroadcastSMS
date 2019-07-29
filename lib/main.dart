@@ -45,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<CustomContact> _uiCustomContacts = List<CustomContact>();
   List<CustomContact> _allContacts = List<CustomContact>();
   bool _isLoading = false;
-  bool _isSelectedContactsView = false;
   String floatingButtonLabel;
   Color floatingButtonColor;
   IconData icon;
@@ -232,7 +231,7 @@ class _SendScreenState extends State<SendScreen> {
     getSmsPermission().then((granted) {
       if (granted == PermissionStatus.authorized) {
         _showDialog(messageField.text);
-        
+
       } else {
         showDialog(
           context: context,
