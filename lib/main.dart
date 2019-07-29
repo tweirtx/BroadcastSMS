@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
+import 'package:sms_maintained/sms.dart';
 
 void main() => runApp(new MyApp());
 
@@ -163,12 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _restateFloatingButton(String label, IconData icon, Color color) {
-    floatingButtonLabel = label;
-    icon = icon;
-    floatingButtonColor = color;
-  }
-
   refreshContacts() async {
     setState(() {
       _isLoading = true;
@@ -201,7 +196,14 @@ class CustomContact {
     this.isChecked = false,
   });
 }
-class SendScreen extends StatelessWidget {
+class SendScreen extends StatefulWidget {
+  @override
+  _SendScreenState createState() => new _SendScreenState();
+
+
+}
+class _SendScreenState extends State<SendScreen> {
+  TextEditingController messageField = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -212,7 +214,7 @@ class SendScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[TextField(
-
+            controller: messageField,
           ),
             RaisedButton(
               onPressed: _textContacts,
@@ -227,13 +229,31 @@ class SendScreen extends StatelessWidget {
     );
   }
   void _textContacts() {
-    _showDialog("TODO");
+    getSmsPermission().then((granted) {
+      if (granted == PermissionStatus.authorized) {
+        _showDialog(messageField.text);
+        
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Oops!'),
+            content: const Text('Looks like permission to send SMS is not granted.'),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
-
   void _showDialog(String message) {
     // flutter defined function
     showDialog(
-
+      context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
@@ -252,4 +272,6 @@ class SendScreen extends StatelessWidget {
       },
     );
   }
+  Future<PermissionStatus> getSmsPermission() =>
+      SimplePermissions.requestPermission(Permission.SendSMS);
 }
