@@ -134,7 +134,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onSubmit() {
       Navigator.push(
         context,
-        new MaterialPageRoute(builder: (context) => new SendScreen()),
+        new MaterialPageRoute(builder: (context) => new SendScreen(
+          contacts: _uiCustomContacts,
+        )),
       );
   }
 
@@ -196,12 +198,16 @@ class CustomContact {
   });
 }
 class SendScreen extends StatefulWidget {
+  final List<CustomContact> contacts;
+  SendScreen({this.contacts});
   @override
-  _SendScreenState createState() => new _SendScreenState();
+  _SendScreenState createState() => new _SendScreenState(contacts: contacts);
 
 
 }
 class _SendScreenState extends State<SendScreen> {
+  final List<CustomContact> contacts;
+  _SendScreenState({this.contacts});
   TextEditingController messageField = new TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -227,11 +233,21 @@ class _SendScreenState extends State<SendScreen> {
       ),
     );
   }
+  void _sendIt(CustomContact contact) {
+    if (contact.isChecked) {
+      SmsMessage msg = new SmsMessage(contact.contact.phones
+          .toList()
+          .elementAt(0)
+          .value
+          .toString(), messageField.text);
+      SmsSender().sendSms(msg);
+    }
+  }
   void _textContacts() {
     getSmsPermission().then((granted) {
       if (granted == PermissionStatus.authorized) {
         _showDialog(messageField.text);
-
+        contacts.forEach(_sendIt);
       } else {
         showDialog(
           context: context,
