@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
 import 'package:sms_maintained/sms.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 void main() => runApp(new MyApp());
 
@@ -246,8 +248,9 @@ class _SendScreenState extends State<SendScreen> {
   void _textContacts() {
     getSmsPermission().then((granted) {
       if (granted == PermissionStatus.authorized) {
-        _showDialog(messageField.text);
+        _toast("Sending...");
         contacts.forEach(_sendIt);
+        _toast("Messages sent!");
       } else {
         showDialog(
           context: context,
@@ -286,6 +289,9 @@ class _SendScreenState extends State<SendScreen> {
         );
       },
     );
+  }
+  void _toast(String msg) {
+    Fluttertoast.showToast(msg: msg);
   }
   Future<PermissionStatus> getSmsPermission() =>
       SimplePermissions.requestPermission(Permission.SendSMS);
