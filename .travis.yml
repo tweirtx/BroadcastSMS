@@ -3,6 +3,7 @@ script: flutter build apk
 install: git clone https://github.com/flutter/flutter && export PATH="$PATH:./flutter/bin" && flutter doctor
 android:
   components:
+    - android-27
     - android-28
     - build-tools-27.0.3
     - build-tools-28.0.3
