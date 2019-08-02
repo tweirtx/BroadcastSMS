@@ -1,10 +1,12 @@
 import 'dart:async';
 
+//import 'package:broadcast_sms/showdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
 import 'package:sms_maintained/sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 
 
 void main() => runApp(new MyApp());
@@ -28,10 +30,8 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-  final String reloadLabel = 'Reload!';
   final String fireLabel = 'Select contacts';
   final Color floatingButtonColor = Colors.blue;
-  final IconData reloadIcon = Icons.refresh;
   final IconData fireIcon = Icons.filter_center_focus;
 
   @override
@@ -50,28 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String floatingButtonLabel;
   Color floatingButtonColor;
   IconData icon;
-  void _showDialog(String message) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Notice"),
-          content: new Text(message),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   _MyHomePageState({
     this.floatingButtonLabel,
     this.icon,
@@ -89,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Oops!'),
-            content: const Text('Looks like permission to read contacts is not granted.'),
+            content: const Text('Looks like permission to read contacts is not granted. Please restart the app and grant permission.'),
             actions: <Widget>[
               FlatButton(
                 child: const Text('OK'),
@@ -222,6 +201,7 @@ class _SendScreenState extends State<SendScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[TextField(
             controller: messageField,
+            maxLines: null,
           ),
             RaisedButton(
               onPressed: _textContacts,
@@ -230,10 +210,20 @@ class _SendScreenState extends State<SendScreen> {
                   style: TextStyle(fontSize: 20)
               ),
             ),
+            RaisedButton(
+              onPressed: _sendEmojiTest,
+              child: Text(
+                'Send Emoji Test'
+            ),
+            )
           ],
         ),
       ),
     );
+  }
+  void _sendEmojiTest() {
+    SmsMessage smsMessage = new SmsMessage('5125458529', "");
+    SmsSender().sendSms(smsMessage);
   }
   void _sendIt(CustomContact contact) {
     if (contact.isChecked) {
@@ -256,7 +246,7 @@ class _SendScreenState extends State<SendScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Oops!'),
-            content: const Text('Looks like permission to send SMS is not granted.'),
+            content: const Text('Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
             actions: <Widget>[
               FlatButton(
                 child: const Text('OK'),
@@ -267,28 +257,6 @@ class _SendScreenState extends State<SendScreen> {
         );
       }
     });
-  }
-  void _showDialog(String message) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Notice"),
-          content: new Text(message),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
   void _toast(String msg) {
     Fluttertoast.showToast(msg: msg);
