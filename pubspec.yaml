@@ -17,7 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  sms_maintained: ^0.2.5
+  flutter_sms: ^1.0.1
   contacts_service: ^0.2.8
   simple_permissions: ^0.1.9
   fluttertoast: ^2.2.11

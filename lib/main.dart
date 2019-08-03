@@ -4,7 +4,7 @@ import 'package:broadcast_sms/showdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
-import 'package:sms_maintained/sms.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 
@@ -222,17 +222,11 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
   void _sendEmojiTest() {
-    SmsMessage smsMessage = new SmsMessage('5125458529', "");
-    SmsSender().sendSms(smsMessage);
+    FlutterSms.sendSMS(message: "", recipients: ["1234567890"]);
   }
   void _sendIt(CustomContact contact) {
     if (contact.isChecked) {
-      SmsMessage msg = new SmsMessage(contact.contact.phones
-          .toList()
-          .elementAt(0)
-          .value
-          .toString(), messageField.text);
-      SmsSender().sendSms(msg);
+      FlutterSms.sendSMS(message: messageField.text, recipients: [contact.contact.phones.toList().elementAt(0).value]);
     }
   }
   void _textContacts() {
