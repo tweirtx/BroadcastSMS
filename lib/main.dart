@@ -1,6 +1,6 @@
 import 'dart:async';
 
-//import 'package:broadcast_sms/showdialog.dart';
+import 'package:broadcast_sms/showdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
@@ -236,6 +236,16 @@ class _SendScreenState extends State<SendScreen> {
     }
   }
   void _textContacts() {
+    int contactSendCount = 0;
+    for (CustomContact contact in contacts) {
+      if (contact.isChecked) {
+        contactSendCount++;
+      }
+    }
+    if (contactSendCount == 0) {
+      dialogShower().presentDialog("No contacts selected. Please select at least one contact and try again.", context);
+      return;
+    }
     getSmsPermission().then((granted) {
       if (granted == PermissionStatus.authorized) {
         _toast("Sending...");

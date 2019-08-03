@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class dialogShower {
-  void _showDialog(String message, BuildContext context) {
+  void presentDialog(String message, BuildContext context) {
     // flutter defined function
     showDialog(
       context: context,
