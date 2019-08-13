@@ -35,7 +35,7 @@ packages:
       name: contacts_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.8"
+    version: "0.2.9"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -48,13 +48,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_sms:
-    dependency: "direct main"
-    description:
-      name: flutter_sms
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -87,7 +80,7 @@ packages:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.2"
+    version: "1.6.4"
   pedantic:
     dependency: transitive
     description:
@@ -101,7 +94,7 @@ packages:
       name: quiver
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.3"
+    version: "2.0.5"
   simple_permissions:
     dependency: "direct main"
     description:
@@ -114,6 +107,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  sms_maintained:
+    dependency: "direct main"
+    description:
+      name: sms_maintained
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.5"
   source_span:
     dependency: transitive
     description:
@@ -141,7 +141,7 @@ packages:
       name: string_scanner
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   term_glyph:
     dependency: transitive
     description:

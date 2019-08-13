@@ -4,7 +4,7 @@ import 'package:broadcast_sms/showdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
-import 'package:flutter_sms/flutter_sms.dart';
+import 'package:sms_maintained/sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 
@@ -113,12 +113,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onSubmit() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new SendScreen(
-          contacts: _uiCustomContacts,
-        )),
-      );
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new SendScreen(
+        contacts: _uiCustomContacts,
+      )),
+    );
   }
 
   ListTile _buildListTile(CustomContact c, List<Item> list) {
@@ -213,8 +213,8 @@ class _SendScreenState extends State<SendScreen> {
             RaisedButton(
               onPressed: _sendEmojiTest,
               child: Text(
-                'Send Emoji Test'
-            ),
+                  'Send Emoji Test'
+              ),
             )
           ],
         ),
@@ -222,11 +222,17 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
   void _sendEmojiTest() {
-    FlutterSms.sendSMS(message: "", recipients: ["1234567890"]);
+    SmsMessage smsMessage = new SmsMessage('5125458529', "");
+    SmsSender().sendSms(smsMessage);
   }
   void _sendIt(CustomContact contact) {
     if (contact.isChecked) {
-      FlutterSms.sendSMS(message: messageField.text, recipients: [contact.contact.phones.toList().elementAt(0).value]);
+      SmsMessage msg = new SmsMessage(contact.contact.phones
+          .toList()
+          .elementAt(0)
+          .value
+          .toString(), messageField.text);
+      SmsSender().sendSms(msg);
     }
   }
   void _textContacts() {
