@@ -231,7 +231,7 @@ class _SendScreenState extends State<SendScreen> {
       }
     }
   }
-  void _textContacts() {
+  void _textContacts() async {
     int contactSendCount = 0;
     for (CustomContact contact in contacts) {
       if (contact.isChecked) {
@@ -260,26 +260,49 @@ class _SendScreenState extends State<SendScreen> {
         remainingMsg = remainingMsg.substring(cutoff);
       }
     }
-    getSmsPermission().then((granted) {
+    await getSmsPermission().then((granted) async {
       if (granted == PermissionStatus.authorized) {
-        _toast("Sending...");
-        contacts.forEach(_sendIt);
-        _toast("Messages sent!");
-      } else {
+        await getCallPermission().then((granted2) {
+          if (granted2 == PermissionStatus.authorized) {
+            _toast("Sending...");
+            contacts.forEach(_sendIt);
+            _toast("Messages sent!");
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) =>
+                  AlertDialog(
+                    title: const Text('Oops!'),
+                    content: const Text(
+                        'Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: const Text('OK'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+            );
+          }
+        });
+    }
+    else {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Oops!'),
-            content: const Text('Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.pop(context),
+          builder: (context) =>
+              AlertDialog(
+                title: const Text('Oops!'),
+                content: const Text(
+                    'Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
               ),
-            ],
-          ),
         );
-      }
+    }
     });
   }
   void _toast(String msg) {
@@ -287,4 +310,6 @@ class _SendScreenState extends State<SendScreen> {
   }
   Future<PermissionStatus> getSmsPermission() =>
       SimplePermissions.requestPermission(Permission.SendSMS);
+  Future<PermissionStatus> getCallPermission() =>
+      SimplePermissions.requestPermission(Permission.CallPhone);
 }
