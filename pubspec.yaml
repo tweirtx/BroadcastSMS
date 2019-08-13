@@ -21,6 +21,8 @@ dependencies:
   contacts_service: ^0.2.8
   simple_permissions: ^0.1.9
   fluttertoast: ^2.2.11
+  validators: ^2.0.0
+
 
   flutter:
     sdk: flutter

@@ -6,6 +6,8 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:simple_permissions/simple_permissions.dart';
 import 'package:sms_maintained/sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:validators/validators.dart';
+
 
 
 
@@ -189,6 +191,7 @@ class SendScreen extends StatefulWidget {
 class _SendScreenState extends State<SendScreen> {
   final List<CustomContact> contacts;
   _SendScreenState({this.contacts});
+  List<String> msgParts = new List<String>();
   TextEditingController messageField = new TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -210,29 +213,22 @@ class _SendScreenState extends State<SendScreen> {
                   style: TextStyle(fontSize: 20)
               ),
             ),
-            RaisedButton(
-              onPressed: _sendEmojiTest,
-              child: Text(
-                  'Send Emoji Test'
-              ),
-            )
           ],
         ),
       ),
     );
   }
-  void _sendEmojiTest() {
-    SmsMessage smsMessage = new SmsMessage('5125458529', "");
-    SmsSender().sendSms(smsMessage);
-  }
+
   void _sendIt(CustomContact contact) {
     if (contact.isChecked) {
-      SmsMessage msg = new SmsMessage(contact.contact.phones
-          .toList()
-          .elementAt(0)
-          .value
-          .toString(), messageField.text);
-      SmsSender().sendSms(msg);
+      for (String msgPart in msgParts) {
+        SmsMessage msg = new SmsMessage(contact.contact.phones
+            .toList()
+            .elementAt(0)
+            .value
+            .toString(), msgPart);
+        SmsSender().sendSms(msg);
+      }
     }
   }
   void _textContacts() {
@@ -245,6 +241,24 @@ class _SendScreenState extends State<SendScreen> {
     if (contactSendCount == 0) {
       dialogShower().presentDialog("No contacts selected. Please select at least one contact and try again.", context);
       return;
+    }
+    int cutoff;
+    String remainingMsg = messageField.text;
+    if(isAscii(remainingMsg)) {
+      cutoff = 160;
+    }
+    else {
+      cutoff = 140;
+    }
+    while (remainingMsg.length > 0) {
+      if (remainingMsg.length < cutoff) {
+        msgParts.add(remainingMsg);
+        remainingMsg = "";
+      }
+      else {
+        msgParts.add(remainingMsg.substring(0, cutoff));
+        remainingMsg = remainingMsg.substring(cutoff);
+      }
     }
     getSmsPermission().then((granted) {
       if (granted == PermissionStatus.authorized) {
