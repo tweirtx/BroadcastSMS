@@ -32,7 +32,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-  final String fireLabel = 'Select contacts';
+  final String fireLabel = 'Select Contacts';
   final Color floatingButtonColor = Colors.blue;
   final IconData fireIcon = Icons.filter_center_focus;
 
@@ -95,9 +95,8 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: _uiCustomContacts?.length,
           itemBuilder: (BuildContext context, int index) {
             CustomContact _contact = _uiCustomContacts[index];
-            var _phonesList = _contact.contact.phones.toList();
 
-            return _buildListTile(_contact, _phonesList);
+            return _buildListTile(_contact, _contact.phone);
           },
         ),
       )
@@ -123,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  ListTile _buildListTile(CustomContact c, List<Item> list) {
+  ListTile _buildListTile(CustomContact c, String phone) {
     return ListTile(
       leading: (c.contact.avatar != null)
           ? CircleAvatar(backgroundImage: MemoryImage(c.contact.avatar))
@@ -134,9 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
             style: TextStyle(color: Colors.white)),
       ),
       title: Text(c.contact.displayName ?? ""),
-      subtitle: list.length >= 1 && list[0]?.value != null
-          ? Text(list[0].value)
-          : Text(''),
+      subtitle: Text(phone),
       trailing: Checkbox(
           activeColor: Colors.green,
           value: c.isChecked,
@@ -159,8 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _populateContacts(Iterable<Contact> contacts) {
     _contacts = contacts.where((item) => item.displayName != null).toList();
     _contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
-    _allContacts =
-        _contacts.map((contact) => CustomContact(contact: contact)).toList();
+    _allContacts = List<CustomContact>();
+    for (Contact c in _contacts) {
+      for (Item phone in c.phones) {
+        _allContacts.add(CustomContact(phone: phone.value, contact: c));
+      }
+    }
     setState(() {
       _uiCustomContacts = _allContacts;
       _isLoading = false;
@@ -172,11 +173,13 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class CustomContact {
+  final String phone;
   final Contact contact;
   bool isChecked;
 
   CustomContact({
     this.contact,
+    this.phone,
     this.isChecked = false,
   });
 }
@@ -222,20 +225,27 @@ class _SendScreenState extends State<SendScreen> {
   void _sendIt(CustomContact contact) {
     if (contact.isChecked) {
       for (String msgPart in msgParts) {
-        SmsMessage msg = new SmsMessage(contact.contact.phones
-            .toList()
-            .elementAt(0)
-            .value
-            .toString(), msgPart);
+        SmsMessage msg = new SmsMessage(contact.phone, msgPart);
         SmsSender().sendSms(msg);
       }
     }
   }
   void _textContacts() async {
     int contactSendCount = 0;
+    bool duplicateTrigger;
     for (CustomContact contact in contacts) {
+      duplicateTrigger = false;
       if (contact.isChecked) {
         contactSendCount++;
+      }
+      for (CustomContact contact2 in contacts) {
+        if (contact.phone == contact2.phone && duplicateTrigger && contact.isChecked) {
+          dialogShower().presentDialog("The same number is selected multiple times. Please deselect any duplicates and try again.", context);
+          return;
+        }
+        else if (contact.phone == contact2.phone && !duplicateTrigger && contact.isChecked) {
+          duplicateTrigger = true;
+        }
       }
     }
     if (contactSendCount == 0) {
