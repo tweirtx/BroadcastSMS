@@ -1,6 +1,10 @@
 language: android
 script: flutter build apk
-install: git clone https://github.com/flutter/flutter && export PATH="$PATH:./flutter/bin" && flutter doctor
+install:
+  - git clone https://github.com/flutter/flutter
+  - export PATH="$PATH:./flutter/bin"
+    flutter version 1.9.1+hotfix.4
+  - flutter doctor
 android:
   components:
     - android-27
