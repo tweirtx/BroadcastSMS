@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:broadcast_sms/showdialog.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_sms/flutter_sms_platform.dart';
 import 'package:simple_permissions/simple_permissions.dart';
-import 'package:sms_maintained/sms.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:validators/validators.dart';
 
@@ -193,44 +195,28 @@ class SendScreen extends StatefulWidget {
 }
 class _SendScreenState extends State<SendScreen> {
   final List<CustomContact> contacts;
+
   _SendScreenState({this.contacts});
+
   List<String> msgParts = new List<String>();
   TextEditingController messageField = new TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Broadcast SMS"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[TextField(
-            controller: messageField,
-            maxLines: null,
-          ),
-            RaisedButton(
-              onPressed: _textContacts,
-              child: Text(
-                  'Send',
-                  style: TextStyle(fontSize: 20)
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _sendIt(CustomContact contact) {
-    if (contact.isChecked) {
-      for (String msgPart in msgParts) {
-        SmsMessage msg = new SmsMessage(contact.phone, msgPart);
-        SmsSender().sendSms(msg);
+  Future<void> _sendIt(List<CustomContact> contacts) async { {
+    for(CustomContact contact in contacts) {
+      if (contact.isChecked) {
+        var response = await sendSMS(
+            message: messageField.text, recipients: [contact.phone]);
+        while (!response.contains("SMS Sent!")) {
+          print(false);
+        }
       }
     }
+  }}
+
+  void _toast(String msg) {
+    Fluttertoast.showToast(msg: msg);
   }
-  void _textContacts() async {
+
+  void textContacts() {
     int contactSendCount = 0;
     bool duplicateTrigger;
     for (CustomContact contact in contacts) {
@@ -239,22 +225,28 @@ class _SendScreenState extends State<SendScreen> {
         contactSendCount++;
       }
       for (CustomContact contact2 in contacts) {
-        if (contact.phone == contact2.phone && duplicateTrigger && contact.isChecked) {
-          dialogShower().presentDialog("The same number is selected multiple times. Please deselect any duplicates and try again.", context);
+        if (contact.phone == contact2.phone && duplicateTrigger &&
+            contact.isChecked) {
+          dialogShower().presentDialog(
+              "The same number is selected multiple times. Please deselect any duplicates and try again.",
+              context);
           return;
         }
-        else if (contact.phone == contact2.phone && !duplicateTrigger && contact.isChecked) {
+        else if (contact.phone == contact2.phone && !duplicateTrigger &&
+            contact.isChecked) {
           duplicateTrigger = true;
         }
       }
     }
     if (contactSendCount == 0) {
-      dialogShower().presentDialog("No contacts selected. Please select at least one contact and try again.", context);
+      dialogShower().presentDialog(
+          "No contacts selected. Please select at least one contact and try again.",
+          context);
       return;
     }
     int cutoff;
     String remainingMsg = messageField.text;
-    if(isAscii(remainingMsg)) {
+    if (isAscii(remainingMsg)) {
       cutoff = 160;
     }
     else {
@@ -270,56 +262,35 @@ class _SendScreenState extends State<SendScreen> {
         remainingMsg = remainingMsg.substring(cutoff);
       }
     }
-    await getSmsPermission().then((granted) async {
-      if (granted == PermissionStatus.authorized) {
-        await getCallPermission().then((granted2) {
-          if (granted2 == PermissionStatus.authorized) {
-            _toast("Sending...");
-            contacts.forEach(_sendIt);
-            _toast("Messages sent!");
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) =>
-                  AlertDialog(
-                    title: const Text('Oops!'),
-                    content: const Text(
-                        'Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: const Text('OK'),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-            );
-          }
-        });
-    }
-    else {
-        showDialog(
-          context: context,
-          builder: (context) =>
-              AlertDialog(
-                title: const Text('Oops!'),
-                content: const Text(
-                    'Looks like permission to send SMS is not granted. Please allow Broadcast SMS to send SMS.'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: const Text('OK'),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
+
+    _toast("Sending...");
+    _sendIt(contacts);
+    _toast("Messages sent!");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Broadcast SMS"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[TextField(
+            controller: messageField,
+            maxLines: null,
+          ),
+            RaisedButton(
+              onPressed: textContacts,
+              child: Text(
+                  'Send',
+                  style: TextStyle(fontSize: 20)
               ),
-        );
-    }
-    });
+            ),
+          ],
+        ),
+      ),
+    );
   }
-  void _toast(String msg) {
-    Fluttertoast.showToast(msg: msg);
-  }
-  Future<PermissionStatus> getSmsPermission() =>
-      SimplePermissions.requestPermission(Permission.SendSMS);
-  Future<PermissionStatus> getCallPermission() =>
-      SimplePermissions.requestPermission(Permission.CallPhone);
 }
