@@ -3,7 +3,7 @@ script: flutter build apk
 install:
   - git clone https://github.com/flutter/flutter
   - export PATH="$PATH:./flutter/bin"
-  - flutter version v1.9.1+hotfix.4
+ # - flutter version v1.9.1+hotfix.4
   - flutter doctor
 android:
   components:
